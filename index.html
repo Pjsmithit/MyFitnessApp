@@ -42,7 +42,7 @@ body[data-tab=training] #stage{background:#1a1a1a}
 </div>
 <div id="t"></div>
 <script>
-const BUILD='2026-10-17-sync1'; // bump this each time you publish new files
+const BUILD='2026-10-17-sync2'; // bump this each time you publish new files
 window.BUILD=BUILD;
 const $=s=>document.querySelector(s);
 const LG=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
@@ -127,7 +127,7 @@ $('#bk').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)r
 $('#bk').addEventListener('change',e=>{if(e.target.id=='fi'&&e.target.files[0]){doRestore(e.target.files[0]);e.target.value=''}});
 
 // ---------- Supabase sync (one project, one table: app_data) ----------
-const CFG={url:'',key:''}; // optional: paste your project URL and anon key here instead of typing them in the app
+const CFG={url:'https://wmgsikbitvkyeuxhgblz.supabase.co',key:'sb_publishable_tXiJqQ_KBQ0N7NOcWHpZtA_cmae7hYP'}; // public publishable key – safe in the app
 const J=(k,d)=>{try{return JSON.parse(LG(k))??d}catch(e){return d}};
 const cfg=()=>{const c=J('sync.cfg',null);if(c&&c.url&&c.key)return c;return CFG.url&&CFG.key?CFG:null};
 let sess=J('sync.sess',null),sstate=J('sync.state',{uid:null,since:'',h:{}}),sbusy=false,sstat=sess?'idle':'out',smsg='',slast=J('sync.last',null);
