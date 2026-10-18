@@ -51,7 +51,7 @@ body[data-tab=menu] #bar{display:none}body[data-tab=menu] #stage{top:0}
 </div>
 <div id="t"></div>
 <script>
-const BUILD='2026-10-18-syncui'; // bump this each time you publish new files
+const BUILD='2026-10-18-lessfreq'; // bump this each time you publish new files
 window.BUILD=BUILD;
 const $=s=>document.querySelector(s);
 const LG=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
@@ -160,6 +160,7 @@ const split=id=>{const i=id.indexOf('|');return[id.slice(0,i),id.slice(i+1)]};
 
 async function syncNow(manual){
   if(sbusy||!cfg()||!sess)return;
+  if(!manual&&slast&&Date.now()-slast<90000&&sstat=='ok'){let n=0;try{n=syncInfo('coaching').state=='pending'||syncInfo('training').state=='pending'}catch(e){}if(!n)return}
   if(navigator.onLine===false){sstat='offline';paint();return}
   const{ok}=localMap();if(!ok.coaching||!ok.training){if(manual)toast('Still loading…');return}
   sbusy=true;sstat='sync';paint();
@@ -247,14 +248,14 @@ $('#bk').addEventListener('click',async e=>{const b=e.target.closest('button');i
     dropSess();sstat='out';renderBk();paint()}});
 
 // when to sync: after local edits (storage event from the app frames), on return to the app, when back online, and every 2 minutes
-let st1=null;const kick=(ms=2500)=>{notify();clearTimeout(st1);st1=setTimeout(()=>syncNow(),ms)};
+let st1=null;const kick=(ms=8000)=>{notify();clearTimeout(st1);st1=setTimeout(()=>syncNow(),ms)};
 addEventListener('storage',e=>{if(e.key==='coachlog.v1'||e.key==='trainingTrackerData')kick()});
 let seen=(LG('coachlog.v1')||'').length+'/'+(LG('trainingTrackerData')||'').length;
-setInterval(()=>{const n=(LG('coachlog.v1')||'').length+'/'+(LG('trainingTrackerData')||'').length;if(n!==seen){seen=n;kick(1500)}},5000);
-setInterval(()=>syncNow(),120000);
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState=='visible')kick(500)});
+setInterval(()=>{const n=(LG('coachlog.v1')||'').length+'/'+(LG('trainingTrackerData')||'').length;if(n!==seen){seen=n;kick(3000)}},5000);
+setInterval(()=>{if(document.visibilityState=='visible')syncNow()},300000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState=='visible')kick(1000)});
 addEventListener('online',()=>kick(500));addEventListener('offline',()=>{sstat='offline';paint()});
-Object.values(fr).forEach(f=>f.addEventListener('load',()=>kick(800)));
+Object.values(fr).forEach(f=>f.addEventListener('load',()=>kick(1500)));
 if(cfg()&&!sess)paint();
 
 Object.values(fr).forEach(f=>f.addEventListener('load',()=>{if(tab=='menu')setTimeout(renderMenu,300)}));
